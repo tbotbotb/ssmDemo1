@@ -1,7 +1,15 @@
 package com.atguigu.crud.bean;
 
 public class Department {
-    private Integer deptId;
+	public Department(){}
+	
+    public Department(Integer deptId, String deptName) {
+		super();
+		this.deptId = deptId;
+		this.deptName = deptName;
+	}
+
+	private Integer deptId;
 
     private String deptName;
 
