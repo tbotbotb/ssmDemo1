@@ -10,4 +10,8 @@
 	<typeAliases>
 		<package name="com.atguigu.crud.bean"/>
 	</typeAliases>
+	<!-- 引入mybatis分页插件 -->
+	<plugins>
+		<plugin interceptor="com.github.pagehelper.PageHelper"></plugin>
+	</plugins>
 </configuration>
