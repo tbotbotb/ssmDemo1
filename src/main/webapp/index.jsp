@@ -33,8 +33,8 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 		<!-- 按钮 -->
 		<div class="row">
 			<div class="col-md-4 col-md-offset-8">
-				<button class="btn btn-primary">新增</button>
-				<button class="btn btn-danger">删除</button>
+				<button id="emp_add_modal_btn" class="btn btn-primary">新增</button>
+				<button id="emp_del_modal_btn" class="btn btn-danger">删除</button>
 			</div>
 		</div>
 		<!-- 显示表格 -->
@@ -79,7 +79,61 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 			</div>
 		</div>
 	</div>
+
+	<!-- 模态框 -->
+	<div class="modal fade" id="empAddModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title" id="myModalLabel">员工添加</h4>
+	      </div>
+	      <div class="modal-body">
+	        <form class="form-horizontal">
+			  <div class="form-group">
+			    <label class="col-sm-2 control-label">empName</label>
+			    <div class="col-sm-10">
+			      <input type="text" class="form-control" name="empName" id="empName_add_input" placeholder="empName">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label class="col-sm-2 control-label">email</label>
+			    <div class="col-sm-10">
+			      <input type="text" name="email" class="form-control" id="email_add_input" placeholder="email@atguigu.com">
+			    </div>
+			  </div>
+			  
+			  <div class="form-group">
+			    <label class="col-sm-2 control-label">gender</label>
+			    <div class="col-sm-10">
+				  	<label class="radio-inline">
+					  <input type="radio" name="gender" id="gender1_add_input" value="M" checked="checked"> 男
+					</label>
+					<label class="radio-inline">
+					  <input type="radio" name="gender" id="gender2_add_input" value="F"> 女
+				  	</label>
+			  	</div>
+			  </div>
+			  
+			  <div class="form-group">
+			    <label class="col-sm-2 control-label">deptName</label>
+			    <div class="col-sm-4">
+			    <!-- 部门提交dId即可 -->
+			      <select class="form-control" id="dept_add_select" name="dId">
+				   </select>
+			    </div>
+			  </div>
+			</form>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+	        <button id="emp_btn_save" type="button" class="btn btn-primary">保存</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 	<script type="text/javascript">
+		var totalRecord;
 		//页面加载完成后发送ajax请求,获取分页数据
 		$(function() {
 			//跳转到首页
@@ -109,7 +163,9 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 		//解析显示分页信息
 		function build_page_info(result) {
 			var pageInfo=result.extend.pageInfo;
-			$("#page_info_area").append("当前记录数"+pageInfo.pageNum+",总"+pageInfo.pages+",总"+pageInfo.total+"条记录");
+			$("#page_info_area").append("当前记录数"+pageInfo.pageNum+",总"+
+					pageInfo.pages+",总"+pageInfo.total+"条记录");
+			totalRecord=pageInfo.total;
 		}
 		//解析显示分页条
 		function build_page_nav(result) {
@@ -170,6 +226,44 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 				}
 			});
 		}
+		$("#emp_add_modal_btn").click(function() {
+			//发送ajax请求,显示部门信息下拉列表
+			getDepts();
+			//弹出模态框
+			$("#empAddModal").modal({
+				backdrop:"static"
+			});
+		});
+		function getDepts() {
+			$("#dept_add_select").empty();
+			$.ajax({
+				url:"${APP_PATH}/depts",
+				type:"get",
+				success:function(result){
+					//{"code":100,"msg":"处理成功!",
+					//"extend":{"depts":[{"deptId":1,"deptName":"开发部"},{"deptId":2,"deptName":"测试部"}]}}
+					$.each(result.extend.depts,function(index,item){
+						var optionEle=$("<option></option>").append(item.deptName).attr("value",item.deptId);
+						optionEle.appendTo("#dept_add_select");
+					})
+					//$("#dept_add_select").append()
+				}
+			});
+		}
+		$("#emp_btn_save").click(function() {
+			$.ajax({
+				url:"${APP_PATH}/emp",
+				type:"post",
+				data:$("#empAddModal form").serialize(),
+				success:function(result){
+					//1.关闭模态框
+					$("#empAddModal").modal('hide');
+					//2.跳转到最后一页
+					//发送ajax请求显示最后一页
+					to_page(totalRecord);
+				}
+			});
+		});
 	</script>
 </body>
 </html>
