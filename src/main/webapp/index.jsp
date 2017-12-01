@@ -251,6 +251,10 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 			});
 		}
 		$("#emp_btn_save").click(function() {
+			//先对提交给服务器的数据进行校验
+			if(!validate_add_form()){
+				return false;
+			}
 			$.ajax({
 				url:"${APP_PATH}/emp",
 				type:"post",
@@ -264,6 +268,25 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 				}
 			});
 		});
+		
+		//校验方法
+		function validate_add_form() {
+			var empName=$("#empName_add_input").val();
+			var regName=/(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5})/
+			//校验用户名
+			if(!regName.test(empName)){
+				alert("用户名可以是2-5位中文或者6-16位英文和数字组合");
+				return false;
+			}
+			//校验邮箱信息
+			var email=$("#email_add_input").val();
+			var regEmail=/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+			if(!regEmail.test(email)){
+				alert("邮箱格式不正确");
+				return false;
+			}
+			return true;
+		}
 	</script>
 </body>
 </html>
