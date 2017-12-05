@@ -94,12 +94,14 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 			    <label class="col-sm-2 control-label">empName</label>
 			    <div class="col-sm-10">
 			      <input type="text" class="form-control" name="empName" id="empName_add_input" placeholder="empName">
+			      <span class="help-block"></span>
 			    </div>
 			  </div>
 			  <div class="form-group">
 			    <label class="col-sm-2 control-label">email</label>
 			    <div class="col-sm-10">
 			      <input type="text" name="email" class="form-control" id="email_add_input" placeholder="email@atguigu.com">
+			      <span class="help-block"></span>
 			    </div>
 			  </div>
 			  
@@ -273,20 +275,45 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 		function validate_add_form() {
 			var empName=$("#empName_add_input").val();
 			var regName=/(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5})/
+			showValidateMsg("#empName_add_input", regName.test(empName), "用户名可以是2-5位中文或6-16位英文和数字的组合");
 			//校验用户名
 			if(!regName.test(empName)){
-				alert("用户名可以是2-5位中文或者6-16位英文和数字组合");
+				showValidateMsg($("#empName_add_input"), "error", "用户名可以是2-5位中文或者6-16位英文和数字组合");
 				return false;
+			}
+			else{
+				showValidateMsg($("#empName_add_input"), "success", "用户名可以是2-5位中文或者6-16位英文和数字组合");
 			}
 			//校验邮箱信息
 			var email=$("#email_add_input").val();
 			var regEmail=/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+			
 			if(!regEmail.test(email)){
-				alert("邮箱格式不正确");
+				showValidateMsg($("#email_add_input"), "error", "邮箱格式不正确");
 				return false;
+			}
+			else{
+				showValidateMsg($("#email_add_input"), "success", "邮箱格式不正确");
 			}
 			return true;
 		}
+		
+
+		function showValidateMsg(ele,status,msg) {
+			//清除当前元素class
+			$(ele).parent().removeClass("has-success has-error");
+			$(ele).next("span").text("");
+			if("success"==status){
+				$(ele).parent().addClass("has-success");
+				$(ele).next("span").text("");
+			}
+			else{
+				$(ele).parent().addClass("has-error");
+				$(ele).next("span").text(msg);
+			}
+		}
+
+		
 	</script>
 </body>
 </html>
