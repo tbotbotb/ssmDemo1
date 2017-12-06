@@ -229,6 +229,8 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 			});
 		}
 		$("#emp_add_modal_btn").click(function() {
+			//先清除表单数据(表单重置)
+			$("#empAddModal form")[0].reset();
 			//发送ajax请求,显示部门信息下拉列表
 			getDepts();
 			//弹出模态框
@@ -257,6 +259,9 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 			if(!validate_add_form()){
 				return false;
 			}
+			if($("emp_save_btn").attr("ajax-va")=="error"){
+				return false;
+			}
 			$.ajax({
 				url:"${APP_PATH}/emp",
 				type:"post",
@@ -275,14 +280,13 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 		function validate_add_form() {
 			var empName=$("#empName_add_input").val();
 			var regName=/(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5})/
-			showValidateMsg("#empName_add_input", regName.test(empName), "用户名可以是2-5位中文或6-16位英文和数字的组合");
 			//校验用户名
 			if(!regName.test(empName)){
 				showValidateMsg($("#empName_add_input"), "error", "用户名可以是2-5位中文或者6-16位英文和数字组合");
 				return false;
 			}
 			else{
-				showValidateMsg($("#empName_add_input"), "success", "用户名可以是2-5位中文或者6-16位英文和数字组合");
+				showValidateMsg($("#empName_add_input"), "success", "");
 			}
 			//校验邮箱信息
 			var email=$("#email_add_input").val();
@@ -293,7 +297,7 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 				return false;
 			}
 			else{
-				showValidateMsg($("#email_add_input"), "success", "邮箱格式不正确");
+				showValidateMsg($("#email_add_input"), "success", "");
 			}
 			return true;
 		}
@@ -305,7 +309,7 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 			$(ele).next("span").text("");
 			if("success"==status){
 				$(ele).parent().addClass("has-success");
-				$(ele).next("span").text("");
+				$(ele).next("span").text(msg);
 			}
 			else{
 				$(ele).parent().addClass("has-error");
@@ -313,7 +317,24 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 			}
 		}
 
-		
+		$("#empName_add_input").change(function() {
+			var empName=this.value;
+			$.ajax({
+				url:"${APP_PATH}/checkuser",
+				type:"post",
+				data:"empName="+empName,
+				success:function(result){
+					if(result.code==100){
+						showValidateMsg("#empName_add_input", "success", "用户名可用");
+						$("emp_save_btn").attr("ajax-va","success");
+					}
+					else{
+						showValidateMsg("#empName_add_input", "error", "用户名不可用");
+						$("emp_save_btn").attr("ajax-va","error");
+					}
+				}
+			});
+		});		
 	</script>
 </body>
 </html>
