@@ -256,22 +256,36 @@ pageContext.setAttribute("APP_PATH", request.getContextPath());
 		}
 		$("#emp_btn_save").click(function() {
 			//先对提交给服务器的数据进行校验
+
 			if(!validate_add_form()){
 				return false;
 			}
 			if($("emp_save_btn").attr("ajax-va")=="error"){
 				return false;
 			}
+			//服务器配置校验,@pattern
 			$.ajax({
 				url:"${APP_PATH}/emp",
 				type:"post",
 				data:$("#empAddModal form").serialize(),
 				success:function(result){
-					//1.关闭模态框
-					$("#empAddModal").modal('hide');
-					//2.跳转到最后一页
-					//发送ajax请求显示最后一页
-					to_page(totalRecord);
+					if(result.code==100){
+						//1.关闭模态框
+						$("#empAddModal").modal('hide');
+						//2.跳转到最后一页
+						//发送ajax请求显示最后一页
+						to_page(totalRecord);
+					}
+					else{
+						//显示失败信息
+						if(undefined!=result.extend.errorField.email){
+							showValidateMsg("#email_add_input", "error", result.extend.errorField.email);
+						}
+						if(undefined!=result.extend.errorField.empName){
+							showValidateMsg("#empName_add_input", "error", result.extend.errorField.empName);
+						}
+					
+					}
 				}
 			});
 		});
